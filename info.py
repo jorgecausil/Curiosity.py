@@ -7,6 +7,7 @@ import pyaudio,wave
 import uuid
 import os
 import pyrebase
+import base64
 
 def getmiIpPublica():
     pagina = urllib.urlopen('https://www.cual-es-mi-ip.net/').read()
@@ -84,9 +85,13 @@ def getFoto():
     if leido == True:
         cv2.imwrite("foto.png", frame)
         print("Foto tomada correctamente")
+        image = open('foto.png', 'rb') #open binary file in read mode
+        image_read = image.read()
+        image_64_encode = base64.encodestring(image_read)
     else:
         print("Error al acceder a la camara")
 
+    return image_64_encode
     cap.release()
 
 def getAudio():
@@ -167,9 +172,9 @@ print (DUbicacion)
 print ('')
 print ('')
 print ('-------Foto------')
-# getFoto()
+f = getFoto()
 msjF = "Datos Foto",
-DFoto = (msjF)
+DFoto = (msjF, f)
 print (DFoto)
 print ('')
 print ('')
@@ -209,4 +214,4 @@ firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
 #enviar datos a firebase
-#db.child("TRAPE").push({"informacion":DUniversal})
+# db.child("TRAPE").push({"informacion":DUniversal})
