@@ -54,7 +54,7 @@ def getPuertosOpen():
 #     datos={
 #         "considerIp":"true"
 #     }
-#     url = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyA2bAdTNf2ro3yHQyUWDZBKI_1DHDjk9jg"
+#     url = "https://www.googleapis.com/geolocation/v1/geolocate?key=-----------------------"
 #     response = requests.post(url,json=datos)
 #     data = response.json()
 #     print(str(data))
