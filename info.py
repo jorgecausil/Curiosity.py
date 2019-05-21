@@ -128,14 +128,14 @@ if str(platform_data[0]) == "Windows":
     DNSUUID = (str(U))
     print ('------- Obteniendo Informacion de la placa base------')
     PB = getSerialPlaca()
-    DInfoplaca = (str(PB))
+    DInfoplaca = (PB)
     print ('-------Obteniendo Informacion de las Interfaces de Red------')
     IR = getInterfacesRed()
     DInfored = (IR)
 else:
     print ('linux')
 
-DUniversal = ({'Sistema':DSistema,'Red':DRed,'Disk':DDisk,'Puertos':DPuertos,'Ubicacion':DUbicacion,'Foto':DFoto})
+DUniversal = ({'Sistema':DSistema,'Red':DRed,'Disk':DDisk,'Puertos':DPuertos,'Ubicacion':DUbicacion,'Foto':DFoto,'DInfoplaca':DInfoplaca})
 
 #enviar datos a firebase
 db.child("TRAPE").push(DUniversal)
