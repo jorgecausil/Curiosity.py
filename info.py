@@ -88,7 +88,6 @@ def getInterfacesRed():
     Red = os.popen('netsh wlan show networks mode=bssid').read()
     # Red = os.popen('ipconfig').read()
     ARed.append(Red)
-    print Red
     return Red
 
 def getInterfacesRedL():
